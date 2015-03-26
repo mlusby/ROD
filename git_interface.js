@@ -4,9 +4,9 @@
 //%N = commit notes
 //%cN = commiter name
 //%ci = commiter date
-var format = "%s, %cN, %ci"
+var format = "%s, %cN, %ci%n"
 var branch = "master",
-diffbranch = "Build_git_interface";
+diffbranch = "release";
 
 function GitShell(cmd, repo, callback) {
     console.log(cmd);
@@ -35,7 +35,7 @@ function GetBranches(repo, callback) {
 //GetBranches(repo_location, function (array) { console.log(array); });
 
 function GetStories(repo, branch, diffbranch, callback) {
-    GitShell("git whatchanged --format=format:\"" + format +"\"" + branch + ".." + diffbranch, repo, function (result) {
+    GitShell("git whatchanged --oneline --format=format:\"" + format +"\"" + branch + ".." + diffbranch, repo, function (result) {
         //console.log(result);
         //var re = new RegExp(/^\s*/, 'gmi');        
         //var re = new RegExp('remotes/origin/', 'gmi');
