@@ -2,7 +2,9 @@
 	"name": "node-example",
 	"version": "0.0.1",
 	"dependencies": {
-		"express": "3.1.x"
+		"express": "3.1.x",
+		"hbs":"*",
+		"requirejs":"2.1.8"
 	},
 	"engines": {
 	"node": "0.10.x",
