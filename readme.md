@@ -1,8 +1,9 @@
-Release Overview Dashboard
+### Release Overview Dashboard ###
 
 Developed during Hackathon 8 at Dealertrack.
 
-Yusuf Songur
-Shannon Barrett
-Mark Lusby
+Yusuf Songur <br/>
+Shannon Barrett<br/>
+Mark Lusby<br/>
+
 
