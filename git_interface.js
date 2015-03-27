@@ -1,9 +1,9 @@
 ﻿module.exports = function(){
-    //var repo_location = "C:/git/ROD";
+    var repo_location = "C:/git/ROD";
     //var repoLocation = "/Users/e002796/Documents/Git/ROD";
-    var repo_location = "/Users/mark.lusby/source/ROD/";
+    //var repo_location = "/Users/mark.lusby/source/ROD/";
     var storyTag = new RegExp(/^[bBdD]-[0-9]{5}/);
-    var gitFormat = "%s, %cN, %ci%n";
+    var gitFormat = "%s, %cN, %ci, %h%n";
     //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
     //%N = commit notes
     //%cN = commiter name
@@ -42,15 +42,17 @@
 //GetBranches(repoLocation, function (array) { console.log(array); });
 
     function ProcessStories(result, callback){
+    //console.log(result);
     var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
-    var commitArray = filtered.split("\n");
+    var commitArray = filtered.split("\n");    
     var unmatchedCount = 0;
     var storyList = [];     
     for (i = 0; i < commitArray.length; i++)
         {            
-            var re = new RegExp(/^[bBdD]-[0-9]{5}/);                       
+            var re = new RegExp(/^[bBdD]-[0-9]{5}/);
+            
             if (re.test(commitArray[i]))
-            {
+            {                
                 var array = commitArray[i].split(",");
                 var storyName = commitArray[i].match(re);
                 // check if duplicate story
@@ -61,7 +63,7 @@
                     }
                 if (duplicate == false)
                 {
-                    var story = {Name: storyName[0], Data: {'StoryName': array[0], Commits: 1, Users: array[1].trim(), 'Last Modified': array[2].trim()}};
+                    var story = {Name: storyName[0], Data: {'StoryName': array[0], Commits: 1, Users: array[1].trim(), 'LastModified': array[2].trim()}};
                     storyList.push(story);
                 }
                 else
@@ -75,9 +77,9 @@
                                 storyList[p].Data.Users += "," + array[1].trim();
                             }                            
                             storyList[p].Commits++;
-                            if (storyList[p].Data['Last Modified'] < array[2].trim())
+                            if (storyList[p].Data['LastModified'] < array[2].trim())
                             {
-                                storyList[p].Data['Last Modified'] = array[2].trim();
+                                storyList[p].Data['LastModified'] = array[2].trim();
                             }                            
                         }
                     }
@@ -85,8 +87,15 @@
 
             }
             //get unmatched
+            //todo: use git show-branch <sha1> to find out what branches specific commits are from
             else
             {
+                var array = commitArray[i].split(",");
+                //console.log(array[3]);
+                //var sha1 = array[3].toString();
+                GetBranchName(array[array.length-1], function (array, result) {
+                    console.log("Commit Name: " + array[0] + "\n" + "Sha1: " + array[array.length-1] + "\n"+ "Branch: " + result + "\n");
+                    });                
                 unmatchedCount++;
             }
         }
@@ -108,11 +117,21 @@ GetStories = function (branch, diffbranch, callback) {
             });
         });    
     }
+
+    function GetBranchName(sha1, callback) {
+    GitShell("git show-branch --no-name " + sha1, function (result) {
+            var branchName = "";
+            //console.log("show branch response: " + result);
+            if (result != null)
+            {
+                branchName = result;
+            }
+            return callback(branchName);
+        });
+    }
+
     return ({
         "GetStories" : GetStories,
         "GetBranches" : GetBranches
     });
 }()
-
-
-
