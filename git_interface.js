@@ -1,24 +1,23 @@
-﻿//var repo_location = "C:/git/ROD";
-var repo_location = "/Users/e002796/Documents/Git/ROD"
+﻿//var repoLocation = "C:/git/ROD";
+var repoLocation = "/Users/e002796/Documents/Git/ROD";
+var storyTag = new RegExp(/^[bBdD]-[0-9]{5}/);
 
 //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
 //%N = commit notes
 //%cN = commiter name
 //%ci = commiter date
-var format = "%s, %cN, %ci%n"
+var gitFormat = "%s, %cN, %ci%n"
 var branch = "master",
 diffbranch = "release";
 
 function GitShell(cmd, repo, callback) {
-    console.log(cmd);
     var exec = require('child_process').exec,
-        command = exec(cmd,{cwd: repo_location}),
+        command = exec(cmd,{cwd: repo}),
         result = '';
     command.stdout.on('data', function(data) {
         result += data.toString();
     });
-    command.on('close', function(code) {
-        //console.log("initial result: " + result);
+    command.on('close', function(code) {      
         return callback(result);
     });
 }
@@ -33,18 +32,26 @@ function GetBranches(repo, callback) {
     });    
 }
 
-//GetBranches(repo_location, function (array) { console.log(array); });
+//GetBranches(repoLocation, function (array) { console.log(array); });
 
 function ProcessStories(result, callback){
-//var replaceStr = branch + ".." + diffbranch;
-//var re = new RegExp(/^:.*$|^\s|^\n/,"gmi");
     var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
+    var storyArray = filtered.split("\n");
+    for (var i = 0; i < storyArray.lengh; i++)
+        {
+            var re = new RegExp(/^[bBdD]-[0-9]{5}/);
+            if (re.test(storyArray[i]))
+            {
+                console.log(storyArray[i].match(re));
+            }
+            //console.log(storyArray[i]);
+        }  
   //  var filtered2 = filtered.replace(/master..release\n/gmi,"");
     return callback(filtered);    
 }
 
 function GetStories(repo, branch, diffbranch, callback) {
-    GitShell("git whatchanged --oneline --format=format:\"" + format +"\"" + branch + ".." + diffbranch, repo, function (result) {        
+    GitShell("git whatchanged --oneline --format=format:\"" + gitFormat +"\"" + branch + ".." + diffbranch, repo, function (result) {        
         ProcessStories(result, function(result){
             return callback(result);
         });
@@ -57,6 +64,6 @@ function GetStories(repo, branch, diffbranch, callback) {
     });    
 }
 
-GetStories(repo_location, branch, diffbranch, function(result) { console.log(result); });
+GetStories(repoLocation, branch, diffbranch, function(result) { console.log(result); });
 
 
