@@ -61,7 +61,7 @@
                     }
                 if (duplicate == false)
                 {
-                    var story = {Name: storyName[0], Data: {'Story Name': array[0], Commits: 1, Users: array[1].trim(), 'Last Modified': array[2].trim()}};
+                    var story = {Name: storyName[0], Data: {'StoryName': array[0], Commits: 1, Users: array[1].trim(), 'Last Modified': array[2].trim()}};
                     storyList.push(story);
                 }
                 else
@@ -98,7 +98,7 @@
             jsonList.push(storyList[k].Data);
         }
         var summary = {Stories: jsonList, Unmatched: unmatchedCount};
-        return callback(JSON.stringify(summary));
+        return callback(summary);
     }
 
 GetStories = function (branch, diffbranch, callback) {

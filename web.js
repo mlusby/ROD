@@ -1,4 +1,3 @@
-n
 var branch = "master",
 	diffbranch = "Build_git_interface";
 

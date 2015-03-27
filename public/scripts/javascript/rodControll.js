@@ -37,7 +37,7 @@ $(function(){
 	function pullStory(data, data2){
 		$.ajax({
 		url:'http://localhost:5000/GetStories',
-		data: {brancha:data,branchb:data2}
+		data: {brancha:data,branchb:data2},
 		dataType: 'json',
 		success: function(data){
 			popStory(data);
@@ -50,7 +50,7 @@ $(function(){
 	}
 	function popStory(data){
 		console.log('popStory');
-		var stories = data;
+		var stories = data.Stories;
 		testStory = stories;
 		var retMarkup = data;
 		for(var i=0;i<stories.length;i++){
