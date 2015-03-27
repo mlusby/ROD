@@ -20,14 +20,14 @@ app.get('/', function(req, res) {
 });
 
 app.get('/GetBranches', function(req, res) {
-   res.json(["develop","master"]);
+   git_interface.GetBranches(function(result){
+   	res.json(result);
+   });
 });
 
 app.get('/GetStories', function(req, res) {
 	git_interface.GetStories(branch, diffbranch, function(result) { 
-		res.json(
-	   		result
-	   	);
+		res.json(result);
 	});
 });
 var port = process.env.PORT || 5000 ;

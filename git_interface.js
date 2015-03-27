@@ -35,7 +35,7 @@
             var re = new RegExp('remotes/origin/', 'gmi');
             result.replace(re, '');
             var array = result.split("\n  ");
-            return callback(JSON.stringify(array));
+            return callback(array);
         });    
     }
 
