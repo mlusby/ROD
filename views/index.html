@@ -7,9 +7,14 @@
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 
+	<!-- Font awesome
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"> -->
+
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
 	<script src="scripts/javascript/rodControll.js"></script>
+	<link rel="stylesheet" href="stylesheets/bootstrap-adjust.css">
 	<title>Release Overview Dashboard</title>
 </head>
 <body>
@@ -32,11 +37,29 @@
 				<label for="branch-b">Select Branch B</label>
 				<select id="branch-b" class="form-control branch-b">branch b</select>
 			</div>
+			<br>&nbsp;
+			<button class="btn btn-primary btn-lg btn-block story-pull">Pull Stories<br><i class="glyphicon glyphicon-menu-down"></i></button>
 		</div>
 	</div>
-	<div class="container jumbotron story-container">
+	<div class="container jumbotron story-container" id="story">
 		<h1>Stories</h1>
 		<div class"col-md-12 story-container">
+		</div>
+	</div>
+	<div class="modal fade" id="story-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="myModalLabel">Something did not load right.</h4>
+				</div>
+				<div class="modal-body">
+				...
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </body>
