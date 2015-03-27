@@ -1,7 +1,7 @@
 ﻿module.exports = function(){
-    var repo_location = "C:/git/ROD";
+    //var repo_location = "C:/git/ROD";
     //var repoLocation = "/Users/e002796/Documents/Git/ROD";
-    //var repo_location = "/Users/mark.lusby/source/ROD/",
+    var repo_location = "/Users/mark.lusby/source/ROD/";
     var storyTag = new RegExp(/^[bBdD]-[0-9]{5}/);
     var gitFormat = "%s, %cN, %ci%n";
     //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
@@ -35,7 +35,7 @@
             var re = new RegExp('remotes/origin/', 'gmi');
             result.replace(re, '');
             var array = result.split("\n  ");
-            return callback(JSON.stringify(array));
+            return callback(array);
         });    
     }
 
