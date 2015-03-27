@@ -27,10 +27,10 @@ app.get('/GetStories', function(req, res) {
 	git_interface.GetStories(branch, diffbranch, function(result) { 
 		res.json(
 	   		result
-	   	);
+   	);
 	});
 });
 var port = process.env.PORT || 5000 ;
 app.listen(port, function() {
-	console.log("Listening on " + port);
+   console.log("Listening on " + port);
 });
