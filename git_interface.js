@@ -102,7 +102,7 @@
     }
 
 GetStories = function (branch, diffbranch, callback) {
-    GitShell("git whatchanged --oneline --format=format:\"" + gitFormat +"\"" + branch + ".." + diffbranch, function (result) {        
+    GitShell("git whatchanged --oneline --format=format:\"" + gitFormat +"\" " + branch + ".." + diffbranch, function (result) {        
             ProcessStories(result, function(result){
                 return callback(result);
             });

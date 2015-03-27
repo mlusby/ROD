@@ -25,7 +25,7 @@ app.get('/GetBranches', function(req, res) {
 });
 
 app.get('/GetStories', function(req, res) {
-	git_interface.GetStories(branch, diffbranch, function(result) { 
+	git_interface.GetStories(req.query.brancha, req.query.branchb, function(result) { 
 		res.json(result);
 	});
 });
