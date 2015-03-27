@@ -10,7 +10,7 @@
     //%ci = commiter date
 
     function GitShell(cmd, callback) {
-        console.log(cmd);
+        //console.log(cmd);
         var exec = require('child_process').exec,
             command = exec(cmd,{cwd: repo_location}),
             result = '';
@@ -42,15 +42,15 @@
 //GetBranches(repoLocation, function (array) { console.log(array); });
 
     function ProcessStories(result, callback){
-    //console.log(result);
     var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
-    var commitArray = filtered.split("\n");    
+    var commitArray = filtered.split("\n");     
     var unmatchedCount = 0;
     var storyList = [];     
     for (i = 0; i < commitArray.length; i++)
         {            
             var re = new RegExp(/^[bBdD]-[0-9]{5}/);
-            
+            if (commitArray[i] != null & commitArray[i] != '')
+            {            
             if (re.test(commitArray[i]))
             {                
                 var array = commitArray[i].split(",");
@@ -59,24 +59,24 @@
                 var duplicate = false;
                 for (s = 0; s < storyList.length; s++)
                     {
-                        if (storyList[s].Name == storyName[0]) { duplicate = true; }
+                        if (storyList[s].Name == storyName[0].toUpperCase()) { duplicate = true; }
                     }
                 if (duplicate == false)
                 {
-                    var story = {Name: storyName[0], Data: {'StoryName': array[0], Commits: 1, Users: array[1].trim(), 'LastModified': array[2].trim()}};
+                    var story = {Name: storyName[0].toUpperCase(), Data: {'StoryName': array[0], Commits: 1, Users: array[1].trim(), 'LastModified': array[2].trim()}};
                     storyList.push(story);
                 }
                 else
                 {
                     for (var p in storyList)
-                    {
-                        if (storyList[p].Name == storyName[0])
+                    {                        
+                        if (storyList[p].Name == storyName[0].toUpperCase())
                         {
                             if (storyList[p].Data.Users.indexOf(array[1].trim()) < 0)
                             {
                                 storyList[p].Data.Users += "," + array[1].trim();
                             }                            
-                            storyList[p].Commits++;
+                            storyList[p].Data.Commits++;
                             if (storyList[p].Data['LastModified'] < array[2].trim())
                             {
                                 storyList[p].Data['LastModified'] = array[2].trim();
@@ -90,14 +90,14 @@
             //todo: use git show-branch <sha1> to find out what branches specific commits are from
             else
             {
-                var array = commitArray[i].split(",");
-                //console.log(array[3]);
-                //var sha1 = array[3].toString();
-                GetBranchName(array[array.length-1], function (array, result) {
+                var array = commitArray[i].split(",");                
+                var sha1 = array[array.length-1].toString();                
+                GetBranchName(sha1, function (result) {
                     console.log("Commit Name: " + array[0] + "\n" + "Sha1: " + array[array.length-1] + "\n"+ "Branch: " + result + "\n");
                     });                
                 unmatchedCount++;
             }
+        }
         }
         //clean up storylist
         var jsonList = []
