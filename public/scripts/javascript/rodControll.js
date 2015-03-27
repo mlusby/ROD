@@ -63,7 +63,13 @@ $(function(){
 			$(retMarkup).appendTo('div.story-container');
 		}
 		$('div.story-container').toggle('blind');
-		setTimeout(function(){window.scroll(0,$('#story').offset().top)},300);
+		setTimeout(function(){
+			window.scroll(0,$('#story').offset().top);
+			$('nav.floatnav').css('display','inline-block');
+			window.scroll(function(){
+				if()
+			});
+		},300);
 		setIconActions();
 	}
 
