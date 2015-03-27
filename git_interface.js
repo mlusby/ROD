@@ -1,22 +1,22 @@
-﻿var repoLocation = "C:/git/ROD";
-//var repoLocation = "/Users/e002796/Documents/Git/ROD";
-var storyTag = new RegExp(/^[bBdD]-[0-9]{5}/);
+﻿module.exports = function(){
+    var repo_location = "C:/git/ROD";
+    //var repoLocation = "/Users/e002796/Documents/Git/ROD";
+    //var repo_location = "/Users/mark.lusby/source/ROD/",
+    var storyTag = new RegExp(/^[bBdD]-[0-9]{5}/);
+    var gitFormat = "%s, %cN, %ci%n";
+    //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
+    //%N = commit notes
+    //%cN = commiter name
+    //%ci = commiter date
 
-//git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
-//%N = commit notes
-//%cN = commiter name
-//%ci = commiter date
-var gitFormat = "%s, %cN, %ci%n"
-var branch = "master",
-diffbranch = "release";
-
-function GitShell(cmd, repo, callback) {
-    var exec = require('child_process').exec,
-        command = exec(cmd,{cwd: repo}),
-        result = '';
-    command.stdout.on('data', function(data) {
-        result += data.toString();
-    });
+    function GitShell(cmd, callback) {
+        console.log(cmd);
+        var exec = require('child_process').exec,
+            command = exec(cmd,{cwd: repo_location}),
+            result = '';
+        command.stdout.on('data', function(data) {
+            result += data.toString();
+        });
     command.stderr.on('data', function(data) {
         result += data.toString();        
     });
@@ -24,23 +24,24 @@ function GitShell(cmd, repo, callback) {
     {
         console.log('exec error: ' + command.error);
     }
-    command.on('close', function(code) {      
-        return callback(result);
-    });
-}
+    command.on('close', function(code) {
+            return callback(result);
+        });
+    }
 
-function GetBranches(repo, callback) {
-    GitShell("git branch --all", repo, function (result) {        
-        var re = new RegExp('remotes/origin/', 'gmi');
-        result.replace(re, '');
-        var array = result.split("\n  ");
-        return callback(JSON.stringify(array));
-    });    
-}
+    GetBranches = function (callback) {
+        GitShell("git branch --all", function (result) {
+            //var re = new RegExp(/^\s*/, 'gmi');
+            var re = new RegExp('remotes/origin/', 'gmi');
+            result.replace(re, '');
+            var array = result.split("\n  ");
+            return callback(JSON.stringify(array));
+        });    
+    }
 
 //GetBranches(repoLocation, function (array) { console.log(array); });
 
-function ProcessStories(result, callback){
+    function ProcessStories(result, callback){
     var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
     var commitArray = filtered.split("\n");
     var unmatchedCount = 0;
@@ -81,14 +82,18 @@ function ProcessStories(result, callback){
         return callback(JSON.stringify(summary));
     }
 
-function GetStories(repo, branch, diffbranch, callback) {
-    GitShell("git whatchanged --oneline --format=format:\"" + gitFormat +"\"" + branch + ".." + diffbranch, repo, function (result) {        
-        ProcessStories(result, function(result){
-            return callback(result);
-        });
-    });    
-}
+GetStories = function (branch, diffbranch, callback) {
+    GitShell("git whatchanged --oneline --format=format:\"" + gitFormat +"\"" + branch + ".." + diffbranch, function (result) {        
+            ProcessStories(result, function(result){
+                return callback(result);
+            });
+        });    
+    }
+    return ({
+        "GetStories" : GetStories,
+        "GetBranches" : GetBranches
+    });
+}()
 
-GetStories(repoLocation, branch, diffbranch, function(result) { console.log(result); });
 
 
