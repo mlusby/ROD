@@ -37,7 +37,7 @@ $(function(){
 	function pullStory(data, data2){
 		$.ajax({
 		url:'http://localhost:5000/GetStories',
-		data: {brancha:data,branchb:data2}
+		data: {brancha:data,branchb:data2},
 		dataType: 'json',
 		success: function(data){
 			popStory(data);
@@ -59,11 +59,27 @@ $(function(){
 			for(var k=0;k<stories[i].Users.length;k++){
 				retMarkup += '<li>'+stories[i].Users[k]+'</li>';
 			}
-			retMarkup += '</ul><div class="panel-footer">Last Modifed: *when i get the data*</div></div>';
+			retMarkup += '</ul></div><div class="panel-footer">Last Modifed: *when i get the data*</div></div>';
 			$(retMarkup).appendTo('div.story-container');
 		}
 		$('div.story-container').toggle('blind');
 		setTimeout(function(){window.scroll(0,$('#story').offset().top)},300);
+		setIconActions();
+	}
+
+	function setIconActions(){
+		$('div.story-container')
+			.find('i.glyphicon-new-window')
+			.bind('click', function(){
+				console.log('clicked');
+				var $story = $(this).parent().parent();
+			//	$('#myModal').on('show.bs.modal', function (e) {
+					$('#story-modal-label').text($story.find('.panel-heading').text());
+					$('#story-modal')
+						.find('.modal-body')
+						.text($story.find('.panel-body').text());
+			//	});
+			});
 	}
 
 	function oops(){
