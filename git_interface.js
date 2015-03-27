@@ -1,4 +1,5 @@
-﻿var repo_location = "C:/git/ROD";
+﻿//var repo_location = "C:/git/ROD";
+var repo_location = "/Users/e002796/Documents/Git/ROD"
 
 //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
 //%N = commit notes
@@ -35,8 +36,10 @@ function GetBranches(repo, callback) {
 //GetBranches(repo_location, function (array) { console.log(array); });
 
 function ProcessStories(result, callback){
+//var replaceStr = branch + ".." + diffbranch;
 //var re = new RegExp(/^:.*$|^\s|^\n/,"gmi");
-    var filtered = result.replace(/^:.*$|^\s|^\n/gmi,"");
+    var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
+  //  var filtered2 = filtered.replace(/master..release\n/gmi,"");
     return callback(filtered);    
 }
 
