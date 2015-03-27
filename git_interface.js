@@ -1,7 +1,7 @@
 ﻿module.exports = function(){
-    var repo_location = "C:/git/ROD";
+    //var repo_location = "C:/git/ROD";
     //var repoLocation = "/Users/e002796/Documents/Git/ROD";
-    //var repo_location = "/Users/mark.lusby/source/ROD/",
+    var repo_location = "/Users/mark.lusby/source/ROD/";
     var storyTag = new RegExp(/^[bBdD]-[0-9]{5}/);
     var gitFormat = "%s, %cN, %ci%n";
     //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
@@ -79,7 +79,7 @@
             }
         }
         var summary = {Stories: storyList, Unmatched: unmatchedCount};
-        return callback(JSON.stringify(summary));
+        return callback(summary);
     }
 
 GetStories = function (branch, diffbranch, callback) {
