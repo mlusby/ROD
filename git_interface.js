@@ -57,18 +57,30 @@
                 var duplicate = false;
                 for (s = 0; s < storyList.length; s++)
                     {
-                        if (storyList[s].Name == storyName) { duplicate = true; }
+                        if (storyList[s].Name == storyName[0]) { duplicate = true; }
                     }
                 if (duplicate == false)
                 {
-                    var story = {Name: storyName[0], Description: array[0], Users: array[1], Date: array[2], Commits: 1};
+                    var story = {Name: storyName[0], Data: {'Story Name': array[0], Commits: 1, Users: array[1].trim(), 'Last Modified': array[2].trim()}};
                     storyList.push(story);
                 }
                 else
                 {
-                    var story = {Name: storyName[0], Description: array[0], Users: array[1], Date: array[2], Commits: 1};
-                    storyList.push(story);
-                    //storyList.Name[storyName];
+                    for (var p in storyList)
+                    {
+                        if (storyList[p].Name == storyName[0])
+                        {
+                            if (storyList[p].Data.Users.indexOf(array[1].trim()) < 0)
+                            {
+                                storyList[p].Data.Users += "," + array[1].trim();
+                            }                            
+                            storyList[p].Commits++;
+                            if (storyList[p].Data['Last Modified'] < array[2].trim())
+                            {
+                                storyList[p].Data['Last Modified'] = array[2].trim();
+                            }                            
+                        }
+                    }
                 }
 
             }
@@ -78,7 +90,14 @@
                 unmatchedCount++;
             }
         }
-        var summary = {Stories: storyList, Unmatched: unmatchedCount};
+        //clean up storylist
+        var jsonList = []
+        for (var k in storyList)
+        {
+            storyList[k].Data.Users = storyList[k].Data.Users.split(",");
+            jsonList.push(storyList[k].Data);
+        }
+        var summary = {Stories: jsonList, Unmatched: unmatchedCount};
         return callback(JSON.stringify(summary));
     }
 
