@@ -17,7 +17,7 @@ function GitShell(cmd, repo, callback) {
         result += data.toString();
     });
     command.on('close', function(code) {
-        console.log("initial result: " + result);
+        //console.log("initial result: " + result);
         return callback(result);
     });
 }
@@ -34,14 +34,23 @@ function GetBranches(repo, callback) {
 
 //GetBranches(repo_location, function (array) { console.log(array); });
 
+function ProcessStories(result, callback){
+//var re = new RegExp(/^:.*$|^\s|^\n/,"gmi");
+    var filtered = result.replace(/^:.*$|^\s|^\n/gmi,"");
+    return callback(filtered);    
+}
+
 function GetStories(repo, branch, diffbranch, callback) {
-    GitShell("git whatchanged --oneline --format=format:\"" + format +"\"" + branch + ".." + diffbranch, repo, function (result) {
+    GitShell("git whatchanged --oneline --format=format:\"" + format +"\"" + branch + ".." + diffbranch, repo, function (result) {        
+        ProcessStories(result, function(result){
+            return callback(result);
+        });
         //console.log(result);
         //var re = new RegExp(/^\s*/, 'gmi');        
         //var re = new RegExp('remotes/origin/', 'gmi');
         //result.replace(re, '');
         //var array = result.split("\n  ");
-        return callback(JSON.stringify(result));
+        //return callback(JSON.stringify(clean));
     });    
 }
 
