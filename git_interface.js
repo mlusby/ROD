@@ -1,4 +1,4 @@
-﻿var repo_location = "/Users/mark.lusby/source/ROD/";
+﻿var repo_location = "C:/git/ROD";
 
 //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
 //%N = commit notes
@@ -6,7 +6,7 @@
 //%ci = commiter date
 var format = "%s, %cN, %ci%n"
 var branch = "master",
-diffbranch = "NewChanges";
+diffbranch = "release";
 
 function GitShell(cmd, repo, callback) {
     console.log(cmd);
@@ -41,7 +41,7 @@ function ProcessStories(result, callback){
 }
 
 function GetStories(repo, branch, diffbranch, callback) {
-    GitShell("git whatchanged --oneline --format=format:\"" + format +"\" " + branch + ".." + diffbranch, repo, function (result) {        
+    GitShell("git whatchanged --oneline --format=format:\"" + format +"\"" + branch + ".." + diffbranch, repo, function (result) {        
         ProcessStories(result, function(result){
             return callback(result);
         });
