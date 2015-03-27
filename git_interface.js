@@ -8,6 +8,7 @@
     //%N = commit notes
     //%cN = commiter name
     //%ci = commiter date
+    var util = require("./utils/utils");
 
     function GitShell(cmd, callback) {
         //console.log(cmd);
@@ -30,12 +31,13 @@
     }
 
     GetBranches = function (callback) {
-        GitShell("git branch --all", function (result) {
-            //var re = new RegExp(/^\s*/, 'gmi');
-            var re = new RegExp('remotes/origin/', 'gmi');
-            result.replace(re, '');
-            var array = result.split("\n  ");
-            return callback(array);
+        GitShell("git branch --all", function (result) {            
+            var filtered = result.replace(/^\x2A\s*|^\s*/gmi, '');
+            console.log(filtered);
+            var array = filtered.split("\n");
+            util.ArrayCleanUp(array, function (result) {
+                return callback(result);
+            });            
         });    
     }
 
