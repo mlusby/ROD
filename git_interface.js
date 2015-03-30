@@ -1,7 +1,16 @@
-﻿module.exports = function(){
+﻿var nconf = require('nconf'),
+    path = require('path'),
+    exec = require('child_process').exec;
+
+nconf
+.argv()
+.env()
+.file({file: path.join(__dirname, 'config.json')});
+
+module.exports = function(){
     //var repo_location = "C:/git/ROD";
     //var repoLocation = "/Users/e002796/Documents/Git/ROD";
-    var repo_location = "/Users/mark.lusby/source/ROD/";
+    var repo_location = nconf.get("git:repoLocation");
     var storyTag = new RegExp(/^[bBdD]-[0-9]{5}/);
     var gitFormat = "%s, %cN, %ci%n";
     //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
@@ -11,20 +20,19 @@
 
     function GitShell(cmd, callback) {
         console.log(cmd);
-        var exec = require('child_process').exec,
-            command = exec(cmd,{cwd: repo_location}),
+        var command = exec(cmd,{cwd: repo_location}),
             result = '';
-        command.stdout.on('data', function(data) {
-            result += data.toString();
+            command.stdout.on('data', function(data) {
+                result += data.toString();
+            });
+        command.stderr.on('data', function(data) {
+            result += data.toString();        
         });
-    command.stderr.on('data', function(data) {
-        result += data.toString();        
-    });
-    if (command.error != null)
-    {
-        console.log('exec error: ' + command.error);
-    }
-    command.on('close', function(code) {
+        if (command.error != null)
+        {
+            console.log('exec error: ' + command.error);
+        }
+        command.on('close', function(code) {
             return callback(result);
         });
     }
@@ -42,11 +50,11 @@
 //GetBranches(repoLocation, function (array) { console.log(array); });
 
     function ProcessStories(result, callback){
-    var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
-    var commitArray = filtered.split("\n");
-    var unmatchedCount = 0;
-    var storyList = [];     
-    for (i = 0; i < commitArray.length; i++)
+        var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
+        var commitArray = filtered.split("\n");
+        var unmatchedCount = 0;
+        var storyList = [];     
+        for (i = 0; i < commitArray.length; i++)
         {            
             var re = new RegExp(/^[bBdD]-[0-9]{5}/);                       
             if (re.test(commitArray[i]))
@@ -101,8 +109,8 @@
         return callback(summary);
     }
 
-GetStories = function (branch, diffbranch, callback) {
-    GitShell("git whatchanged --oneline --format=format:\"" + gitFormat +"\" " + branch + ".." + diffbranch, function (result) {        
+    GetStories = function (branch, diffbranch, callback) {
+        GitShell("git whatchanged --oneline --format=format:\"" + gitFormat +"\" " + branch + ".." + diffbranch, function (result) {        
             ProcessStories(result, function(result){
                 return callback(result);
             });
