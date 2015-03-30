@@ -59,7 +59,10 @@ $(function(){
 			for(var k=0;k<stories[i].Users.length;k++){
 				retMarkup += '<li>'+stories[i].Users[k]+'</li>';
 			}
-			retMarkup += '</ul><div class="panel-footer">Last Modifed: *when i get the data*</div></div>';
+			var dateArray = stories[i].LastModified.split(/-|\s|:/);
+			//"2015-03-27 14:42:38 -0500"
+			var date = new Date(dateArray[0],dateArray[1]-1,dateArray[2],dateArray[3],dateArray[4]);
+			retMarkup += '</ul><div class="panel-footer">Last Modifed: '+date.toDateString() + ' ' + date.toLocaleTimeString()+'</div></div>';
 			$(retMarkup).appendTo('div.story-container');
 		}
 		$('div.story-container').toggle('blind');

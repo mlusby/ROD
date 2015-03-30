@@ -17,6 +17,7 @@ module.exports = function(){
     //%N = commit notes
     //%cN = commiter name
     //%ci = commiter date
+    var util = require("./utils/utils");
 
     function GitShell(cmd, callback) {
         console.log(cmd);
@@ -38,12 +39,13 @@ module.exports = function(){
     }
 
     GetBranches = function (callback) {
-        GitShell("git branch --all", function (result) {
-            //var re = new RegExp(/^\s*/, 'gmi');
-            var re = new RegExp('remotes/origin/', 'gmi');
-            result.replace(re, '');
-            var array = result.split("\n  ");
-            return callback(array);
+        GitShell("git branch --all", function (result) {            
+            var filtered = result.replace(/^\x2A\s*|^\s*/gmi, '');
+            console.log(filtered);
+            var array = filtered.split("\n");
+            util.ArrayCleanUp(array, function (result) {
+                return callback(result);
+            });            
         });    
     }
 
@@ -51,41 +53,43 @@ module.exports = function(){
 
     function ProcessStories(result, callback){
         var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
-        var commitArray = filtered.split("\n");
+    var commitArray = filtered.split("\n");
         var unmatchedCount = 0;
         var storyList = [];     
         for (i = 0; i < commitArray.length; i++)
         {            
-            var re = new RegExp(/^[bBdD]-[0-9]{5}/);                       
+            var re = new RegExp(/^[bBdD]-[0-9]{5}/);
+            if (commitArray[i] != null & commitArray[i] != '')
+            {            
             if (re.test(commitArray[i]))
-            {
+            {                
                 var array = commitArray[i].split(",");
                 var storyName = commitArray[i].match(re);
                 // check if duplicate story
                 var duplicate = false;
                 for (s = 0; s < storyList.length; s++)
                     {
-                        if (storyList[s].Name == storyName[0]) { duplicate = true; }
+                        if (storyList[s].Name == storyName[0].toUpperCase()) { duplicate = true; }
                     }
                 if (duplicate == false)
                 {
-                    var story = {Name: storyName[0], Data: {'StoryName': array[0], Commits: 1, Users: array[1].trim(), 'Last Modified': array[2].trim()}};
+                    var story = {Name: storyName[0].toUpperCase(), Data: {'StoryName': array[0], Commits: 1, Users: array[1].trim(), 'LastModified': array[2].trim()}};
                     storyList.push(story);
                 }
                 else
                 {
                     for (var p in storyList)
-                    {
-                        if (storyList[p].Name == storyName[0])
+                    {                        
+                        if (storyList[p].Name == storyName[0].toUpperCase())
                         {
                             if (storyList[p].Data.Users.indexOf(array[1].trim()) < 0)
                             {
                                 storyList[p].Data.Users += "," + array[1].trim();
                             }                            
-                            storyList[p].Commits++;
-                            if (storyList[p].Data['Last Modified'] < array[2].trim())
+                            storyList[p].Data.Commits++;
+                            if (storyList[p].Data['LastModified'] < array[2].trim())
                             {
-                                storyList[p].Data['Last Modified'] = array[2].trim();
+                                storyList[p].Data['LastModified'] = array[2].trim();
                             }                            
                         }
                     }
@@ -93,10 +97,17 @@ module.exports = function(){
 
             }
             //get unmatched
+            //todo: use git show-branch <sha1> to find out what branches specific commits are from
             else
             {
+                var array = commitArray[i].split(",");                
+                var sha1 = array[array.length-1].toString();                
+                GetBranchName(sha1, function (result) {
+                    console.log("Commit Name: " + array[0] + "\n" + "Sha1: " + array[array.length-1] + "\n"+ "Branch: " + result + "\n");
+                    });                
                 unmatchedCount++;
             }
+        }
         }
         //clean up storylist
         var jsonList = []
@@ -116,11 +127,21 @@ module.exports = function(){
             });
         });    
     }
+
+    function GetBranchName(sha1, callback) {
+    GitShell("git show-branch --no-name " + sha1, function (result) {
+            var branchName = "";
+            //console.log("show branch response: " + result);
+            if (result != null)
+            {
+                branchName = result;
+            }
+            return callback(branchName);
+        });
+    }
+
     return ({
         "GetStories" : GetStories,
         "GetBranches" : GetBranches
     });
 }()
-
-
-
