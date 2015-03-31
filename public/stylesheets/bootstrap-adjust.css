@@ -1,3 +1,7 @@
 .jumbotron{padding-left:20px;padding-right:20px;border-radius:10px;}
 .story-container{display:none;}
 .jumbotron .panel-heading i{margin:0 10px;font-size:18px;}
+a.navbar-brand p, a.navbar-brand img{display:inline-block;float:none;overflow:hidden;vertical-align:middle;margin:5px;}
+a.navbar-brand{height:auto;max-width:430px;text-align:right;}
+p.tag-line{text-align:center;top:50px;position:absolute;left:90px;}
+a.navbar-brand p{padding-bottom:10px;}
