@@ -1,6 +1,6 @@
 ﻿var nconf = require('nconf'),
     path = require('path'),
-    exec = require('child_process').exec;
+    spawn = require('child_process').spawn;
 
 nconf
 .argv()
@@ -8,30 +8,28 @@ nconf
 .file({file: path.join(__dirname, 'config.json')});
 
 module.exports = function(){
-    //var repo_location = "C:/git/ROD";
-    //var repoLocation = "/Users/e002796/Documents/Git/ROD";
     var repo_location = nconf.get("git:repoLocation");
     var storyTag = new RegExp(/^[bBdD]-[0-9]{5}/);
-    var gitFormat = "%s, %cN, %ci%n";
+    var gitFormat = "%s, %cN, %ci, %h";
     //git-whatchanged format info:  https://www.kernel.org/pub/software/scm/git/docs/git-whatchanged.html
     //%N = commit notes
     //%cN = commiter name
     //%ci = commiter date
     var util = require("./utils/utils");
 
-    function GitShell(cmd, callback) {
-        console.log(cmd);
-        var command = exec(cmd,{cwd: repo_location}),
+    function GitShell(cmd, args, callback) {
+        //console.log(cmd + " " + args);
+        var command = spawn(cmd, args, {cwd: repo_location}),
             result = '';
             command.stdout.on('data', function(data) {
                 result += data.toString();
-            });
+            });            
         command.stderr.on('data', function(data) {
             result += data.toString();        
         });
         if (command.error != null)
         {
-            console.log('exec error: ' + command.error);
+            console.log('spawn error: ' + command.error);
         }
         command.on('close', function(code) {
             return callback(result);
@@ -39,9 +37,10 @@ module.exports = function(){
     }
 
     GetBranches = function (callback) {
-        GitShell("git branch --all", function (result) {            
+        args = ["branch", "--all"];
+        GitShell("git", args, function (result) {            
             var filtered = result.replace(/^\x2A\s*|^\s*/gmi, '');
-            console.log(filtered);
+            //console.log(filtered);
             var array = filtered.split("\n");
             util.ArrayCleanUp(array, function (result) {
                 return callback(result);
@@ -53,14 +52,17 @@ module.exports = function(){
 
     function ProcessStories(result, callback){
         var filtered = result.replace(/^.+?\.{2}.+?\n|^:.*$\n|^:.*$|^\s*/gmi,"");
-    var commitArray = filtered.split("\n");
+        var commitArray = [];
+        util.RemoveQuotes(filtered.split("\n"), function(results) {
+            commitArray = results;
+        });
         var unmatchedCount = 0;
         var storyList = [];     
         for (i = 0; i < commitArray.length; i++)
         {            
-            var re = new RegExp(/^[bBdD]-[0-9]{5}/);
+            var re = new RegExp(/^[bBdD]-[0-9]{5}/m);
             if (commitArray[i] != null & commitArray[i] != '')
-            {            
+            {
             if (re.test(commitArray[i]))
             {                
                 var array = commitArray[i].split(",");
@@ -94,17 +96,16 @@ module.exports = function(){
                         }
                     }
                 }
-
             }
             //get unmatched
             //todo: use git show-branch <sha1> to find out what branches specific commits are from
             else
             {
-                var array = commitArray[i].split(",");                
-                var sha1 = array[array.length-1].toString();                
-                GetBranchName(sha1, function (result) {
-                    console.log("Commit Name: " + array[0] + "\n" + "Sha1: " + array[array.length-1] + "\n"+ "Branch: " + result + "\n");
-                    });                
+                //var array = commitArray[i].split(",");                
+                //var sha1 = array[array.length-1].toString();                
+                //GetBranchName(sha1, function (result) {
+                //    console.log("Commit Name: " + array[0] + "\n" + "Sha1: " + array[array.length-1] + "\n"+ "Branch: " + result + "\n");
+                //    });                
                 unmatchedCount++;
             }
         }
@@ -113,7 +114,8 @@ module.exports = function(){
         var jsonList = []
         for (var k in storyList)
         {
-            storyList[k].Data.Users = storyList[k].Data.Users.split(",");
+            storyList[k].Data.StoryName = storyList[k].Data.StoryName.substring(0,1).toUpperCase() + storyList[k].Data.StoryName.substring(1);
+            storyList[k].Data.Users = storyList[k].Data.Users.split(",");            
             jsonList.push(storyList[k].Data);
         }
         var summary = {Stories: jsonList, Unmatched: unmatchedCount};
@@ -121,7 +123,8 @@ module.exports = function(){
     }
 
     GetStories = function (branch, diffbranch, callback) {
-        GitShell("git whatchanged --oneline --format=format:\"" + gitFormat +"\" " + branch + ".." + diffbranch, function (result) {        
+        args = ["whatchanged", "--oneline", "--format=format:\"" + gitFormat + "\"", branch + ".." + diffbranch];
+        GitShell("git", args, function (result) {        
             ProcessStories(result, function(result){
                 return callback(result);
             });
@@ -129,7 +132,8 @@ module.exports = function(){
     }
 
     function GetBranchName(sha1, callback) {
-    GitShell("git show-branch --no-name " + sha1, function (result) {
+        args = ["show-branch", "--no-name", sha1];
+    GitShell("git", args, function (result) {
             var branchName = "";
             //console.log("show branch response: " + result);
             if (result != null)
