@@ -1,1 +1,14 @@
+*.gitattributes
+
 node_modules
+[Bb]in/
+[Oo]bj/
+
+# Sublime stuff
+*.sublime-project
+*.sublime-workspace
+
+# Visual studio stuff
+*.tmp
+*.dat
+*.suo
