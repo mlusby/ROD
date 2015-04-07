@@ -11,7 +11,7 @@ $(function(){
 
 	function pullBranches(){
 		$.ajax({
-		url:'http://localhost:5000/GetBranches',
+		url:'GetBranches',
 		dataType: 'json',
 		success: function(data){
 			popBranches(data);
@@ -36,7 +36,7 @@ $(function(){
 
 	function pullStory(data, data2){
 		$.ajax({
-		url:'http://localhost:5000/GetStories',
+		url:'GetStories',
 		data: {brancha:data,branchb:data2},
 		dataType: 'json',
 		success: function(data){
